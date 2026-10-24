@@ -1,0 +1,17 @@
+<resources>
+    <string name="app_name">Dev常亮</string>
+    <string name="settings_header">场景与动作设置（分别独立控制）</string>
+    <string name="card_wired">USB 连接电脑（有线）</string>
+    <string name="card_wifi">无线调试（adb over Wi-Fi 连入）</string>
+    <string name="sw_enable">启用此场景</string>
+    <string name="sw_keep_awake">充电时保持亮屏</string>
+    <string name="sw_auto_bright">关闭自动亮度</string>
+    <string name="sw_min_bright">亮度调至最低</string>
+    <string name="sw_fallback">Shizuku 未运行时按无线调试开关判定（不精确）</string>
+    <string name="btn_apply">立即应用（按 USB 接入处理）</string>
+    <string name="btn_restore">立即恢复原设置</string>
+    <string name="btn_app_info">打开应用设置（自启动 / 省电策略）</string>
+    <string name="btn_write_settings">去开启「修改系统设置」权限</string>
+    <string name="btn_shizuku">申请 Shizuku 授权</string>
+    <string name="hint_adb">规则：\n· 有线：USB 连接电脑（被电脑识别）→ 按上方「有线」一组开关执行；只接充电头 / 充电宝 / 无线充，或拔出 → 恢复连接前的设置。\n· 无线：有电脑通过无线调试（adb over Wi-Fi）连入手机 → 按「无线调试」一组开关执行；断开后恢复。精确识别电脑连入需要 Shizuku 运行；开启兜底开关后改为按「无线调试」开关状态判定（开关开着就算连接，屏幕会一直保持）。\n\n不依赖 Shizuku 的一次性授权（在电脑上执行，卸载前永久有效，覆盖安装后可能需重跑）：\nadb shell pm grant %1$s android.permission.WRITE_SECURE_SETTINGS\nadb shell appops set %1$s WRITE_SETTINGS allow\n\n小米 / HyperOS 请在「应用信息」里把「自启动」打开、「省电策略」设为无限制，并在最近任务里锁定本应用，否则监听服务可能被系统清理。</string>
+</resources>

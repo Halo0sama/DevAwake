@@ -1,0 +1,25 @@
+<resources>
+    <style name="AppTheme" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/primary</item>
+    </style>
+
+    <style name="SwitchRow">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:orientation">horizontal</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:layout_marginTop">8dp</item>
+    </style>
+
+    <style name="SwitchLabel">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:textAppearance">?attr/textAppearanceBodyMedium</item>
+    </style>
+
+    <style name="SwitchWidget">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+    </style>
+</resources>

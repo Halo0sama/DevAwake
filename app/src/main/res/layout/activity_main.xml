@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="20dp">
+
+        <TextView
+            android:id="@+id/tvStatus"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="28dp"
+            android:textAppearance="?attr/textAppearanceHeadlineSmall" />
+
+        <TextView
+            android:id="@+id/tvPlugged"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:textAppearance="?attr/textAppearanceBodyLarge" />
+
+        <TextView
+            android:id="@+id/tvSettings"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:fontFamily="monospace"
+            android:textAppearance="?attr/textAppearanceBodyMedium" />
+
+        <TextView
+            android:id="@+id/tvWriter"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:textAppearance="?attr/textAppearanceBodyMedium" />
+
+        <TextView
+            android:id="@+id/tvLast"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:textAppearance="?attr/textAppearanceBodyMedium"
+            android:textColor="?attr/colorOnSurfaceVariant" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="@string/settings_header"
+            android:textAppearance="?attr/textAppearanceTitleMedium" />
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="14dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/card_wired"
+                    android:textAppearance="?attr/textAppearanceTitleSmall" />
+
+                <LinearLayout style="@style/SwitchRow">
+                    <TextView
+                        style="@style/SwitchLabel"
+                        android:text="@string/sw_enable" />
+                    <com.google.android.material.materialswitch.MaterialSwitch
+                        android:id="@+id/swWiredEnabled"
+                        style="@style/SwitchWidget" />
+                </LinearLayout>
+
+                <LinearLayout style="@style/SwitchRow">
+                    <TextView
+                        style="@style/SwitchLabel"
+                        android:text="@string/sw_keep_awake" />
+                    <com.google.android.material.materialswitch.MaterialSwitch
+                        android:id="@+id/swWiredKeepAwake"
+                        style="@style/SwitchWidget" />
+                </LinearLayout>
+
+                <LinearLayout style="@style/SwitchRow">
+                    <TextView
+                        style="@style/SwitchLabel"
+                        android:text="@string/sw_auto_bright" />
+                    <com.google.android.material.materialswitch.MaterialSwitch
+                        android:id="@+id/swWiredAutoBright"
+                        style="@style/SwitchWidget" />
+                </LinearLayout>
+
+                <LinearLayout style="@style/SwitchRow">
+                    <TextView
+                        style="@style/SwitchLabel"
+                        android:text="@string/sw_min_bright" />
+                    <com.google.android.material.materialswitch.MaterialSwitch
+                        android:id="@+id/swWiredMinBright"
+                        style="@style/SwitchWidget" />
+                </LinearLayout>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="14dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/card_wifi"
+                    android:textAppearance="?attr/textAppearanceTitleSmall" />
+
+                <LinearLayout style="@style/SwitchRow">
+                    <TextView
+                        style="@style/SwitchLabel"
+                        android:text="@string/sw_enable" />
+                    <com.google.android.material.materialswitch.MaterialSwitch
+                        android:id="@+id/swWifiEnabled"
+                        style="@style/SwitchWidget" />
+                </LinearLayout>
+
+                <LinearLayout style="@style/SwitchRow">
+                    <TextView
+                        style="@style/SwitchLabel"
+                        android:text="@string/sw_keep_awake" />
+                    <com.google.android.material.materialswitch.MaterialSwitch
+                        android:id="@+id/swWifiKeepAwake"
+                        style="@style/SwitchWidget" />
+                </LinearLayout>
+
+                <LinearLayout style="@style/SwitchRow">
+                    <TextView
+                        style="@style/SwitchLabel"
+                        android:text="@string/sw_auto_bright" />
+                    <com.google.android.material.materialswitch.MaterialSwitch
+                        android:id="@+id/swWifiAutoBright"
+                        style="@style/SwitchWidget" />
+                </LinearLayout>
+
+                <LinearLayout style="@style/SwitchRow">
+                    <TextView
+                        style="@style/SwitchLabel"
+                        android:text="@string/sw_min_bright" />
+                    <com.google.android.material.materialswitch.MaterialSwitch
+                        android:id="@+id/swWifiMinBright"
+                        style="@style/SwitchWidget" />
+                </LinearLayout>
+
+                <LinearLayout style="@style/SwitchRow">
+                    <TextView
+                        style="@style/SwitchLabel"
+                        android:text="@string/sw_fallback" />
+                    <com.google.android.material.materialswitch.MaterialSwitch
+                        android:id="@+id/swWifiFallback"
+                        style="@style/SwitchWidget" />
+                </LinearLayout>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <Button
+            android:id="@+id/btnApply"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="@string/btn_apply" />
+
+        <Button
+            android:id="@+id/btnRestore"
+            style="?attr/materialButtonOutlinedStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/btn_restore" />
+
+        <Button
+            android:id="@+id/btnAppInfo"
+            style="?attr/materialButtonOutlinedStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/btn_app_info" />
+
+        <Button
+            android:id="@+id/btnWriteSettings"
+            style="?attr/materialButtonOutlinedStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/btn_write_settings"
+            android:visibility="gone" />
+
+        <Button
+            android:id="@+id/btnShizuku"
+            style="?attr/materialButtonOutlinedStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/btn_shizuku"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/tvHint"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="28dp"
+            android:textAppearance="?attr/textAppearanceBodySmall"
+            android:textColor="?attr/colorOnSurfaceVariant"
+            android:textIsSelectable="true" />
+    </LinearLayout>
+</ScrollView>
