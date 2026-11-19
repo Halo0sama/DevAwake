@@ -46,6 +46,9 @@ class MainActivity : AppCompatActivity() {
 
         findViewById<Button>(R.id.btnApply).setOnClickListener { force(Profile.WIRED, "手动应用") }
         findViewById<Button>(R.id.btnRestore).setOnClickListener { force(Profile.NONE, "手动恢复") }
+        findViewById<Button>(R.id.btnBlackScreen).setOnClickListener {
+            startActivity(Intent(this, BlackScreenActivity::class.java))
+        }
         btnWriteSettings.setOnClickListener {
             startActivity(Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS, Uri.parse("package:$packageName")))
         }

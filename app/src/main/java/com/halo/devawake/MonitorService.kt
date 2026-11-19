@@ -76,6 +76,7 @@ class MonitorService : Service() {
     override fun onBind(intent: Intent?): IBinder? = null
 
     private fun updateNotification() {
+        updateDevNotification()
         val ctx = applicationContext
         val text = when (val profile = DevModeController.activeProfile(ctx)) {
             Profile.WIRED -> "已连接电脑（有线）：${actionsText(Config.wired(ctx))}"
@@ -83,6 +84,38 @@ class MonitorService : Service() {
             Profile.NONE -> "待机：${DevModeController.power(ctx).describe()}"
         }
         getSystemService(NotificationManager::class.java).notify(NOTIF_ID, buildNotification(text))
+    }
+
+    /**
+     * 调试模式生效期间额外挂一条通知，点击进入全黑界面（防误触/防烧屏）；
+     * 退出调试模式时撤下。常驻服务通知本身仍指向应用主界面。
+     */
+    private fun updateDevNotification() {
+        val nm = getSystemService(NotificationManager::class.java)
+        val ctx = applicationContext
+        val profile = DevModeController.activeProfile(ctx)
+        if (profile == Profile.NONE) {
+            nm.cancel(NOTIF_DEV)
+            return
+        }
+        val label = if (profile == Profile.WIRED) "有线" else "无线调试"
+        val actions = actionsText(if (profile == Profile.WIRED) Config.wired(ctx) else Config.wifi(ctx))
+        val open = PendingIntent.getActivity(
+            this, REQ_BLACK,
+            Intent(this, BlackScreenActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
+            PendingIntent.FLAG_IMMUTABLE,
+        )
+        val notification = NotificationCompat.Builder(this, CHANNEL)
+            .setSmallIcon(R.drawable.ic_stat_bolt)
+            .setContentTitle(getString(R.string.notif_dev_title, label))
+            .setContentText(getString(R.string.notif_dev_text, actions))
+            .setContentIntent(open)
+            .setOngoing(true)
+            .setOnlyAlertOnce(true)
+            .setSilent(true)
+            .setPriority(NotificationCompat.PRIORITY_LOW)
+            .build()
+        nm.notify(NOTIF_DEV, notification)
     }
 
     private fun actionsText(cfg: ProfileConfig): String =
@@ -115,6 +148,8 @@ class MonitorService : Service() {
     companion object {
         private const val CHANNEL = "monitor"
         private const val NOTIF_ID = 1
+        private const val NOTIF_DEV = 2
+        private const val REQ_BLACK = 1
         private const val ACTION_USB_STATE = "android.hardware.usb.action.USB_STATE"
 
         @Volatile

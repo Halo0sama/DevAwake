@@ -36,6 +36,11 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name=".BlackScreenActivity"
+            android:excludeFromRecents="false"
+            android:exported="false" />
+
         <!-- 常驻前台服务：动态注册接收器，不受 OEM 对清单接收器的后台限制 -->
         <service
             android:name=".MonitorService"

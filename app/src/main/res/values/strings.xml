@@ -10,6 +10,9 @@
     <string name="sw_fallback">Shizuku 未运行时按无线调试开关判定（不精确）</string>
     <string name="btn_apply">立即应用（按 USB 接入处理）</string>
     <string name="btn_restore">立即恢复原设置</string>
+    <string name="btn_black_screen">进入黑屏模式（触摸屏幕或返回键退出）</string>
+    <string name="notif_dev_title">调试模式生效中（%1$s）</string>
+    <string name="notif_dev_text">%1$s · 点击进入黑屏模式</string>
     <string name="btn_app_info">打开应用设置（自启动 / 省电策略）</string>
     <string name="btn_write_settings">去开启「修改系统设置」权限</string>
     <string name="btn_shizuku">申请 Shizuku 授权</string>
