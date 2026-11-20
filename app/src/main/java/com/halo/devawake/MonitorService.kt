@@ -51,10 +51,10 @@ class MonitorService : Service() {
         instance = this
         running = true
         createChannel()
-        ServiceCompat.startForeground(
-            this, NOTIF_ID, buildNotification("正在监听 USB / 无线调试连接…"),
-            ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE,
-        )
+        // 清理旧版本可能遗留的第二条通知
+        getSystemService(NotificationManager::class.java).cancel(NOTIF_LEGACY_DEV)
+        ServiceCompat.startForeground(this, NOTIF_ID, initialNotification(),
+            ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE)
         WirelessMonitor.start()
         // Shizuku 就绪后修复历史遗留（黑屏期间进程被杀导致侧边栏原值未恢复）
         Tasks.run { SidebarController.migrateLegacy(applicationContext) }
@@ -79,69 +79,55 @@ class MonitorService : Service() {
 
     override fun onBind(intent: Intent?): IBinder? = null
 
-    private fun updateNotification() {
-        updateDevNotification()
-        val ctx = applicationContext
-        val text = when (val profile = DevModeController.activeProfile(ctx)) {
-            Profile.WIRED -> "已连接电脑（有线）：${actionsText(Config.wired(ctx))}"
-            Profile.WIFI -> "已连接电脑（无线调试）：${actionsText(Config.wifi(ctx))}"
-            Profile.NONE -> "待机：${DevModeController.power(ctx).describe()}"
-        }
-        getSystemService(NotificationManager::class.java).notify(NOTIF_ID, buildNotification(text))
-    }
-
     /**
-     * 调试模式生效期间额外挂一条通知，点击进入全黑界面（防误触/防烧屏）；
-     * 退出调试模式时撤下。常驻服务通知本身仍指向应用主界面。
+     * 常驻通知只有一条，随场景状态变化：
+     * 调试模式生效中（有线 / 无线调试）→ 点击进入全黑界面；
+     * 待机 → 点击进应用主界面。
      */
-    private fun updateDevNotification() {
-        val nm = getSystemService(NotificationManager::class.java)
+    private fun updateNotification() {
         val ctx = applicationContext
         val profile = DevModeController.activeProfile(ctx)
-        if (profile == Profile.NONE) {
-            nm.cancel(NOTIF_DEV)
-            return
-        }
-        val label = if (profile == Profile.WIRED) "有线" else "无线调试"
-        val actions = actionsText(if (profile == Profile.WIRED) Config.wired(ctx) else Config.wifi(ctx))
-        val open = PendingIntent.getActivity(
-            this, REQ_BLACK,
-            Intent(this, BlackScreenActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
-            PendingIntent.FLAG_IMMUTABLE,
-        )
-        val notification = NotificationCompat.Builder(this, CHANNEL)
+        val builder = NotificationCompat.Builder(this, CHANNEL)
             .setSmallIcon(R.drawable.ic_stat_bolt)
-            .setContentTitle(getString(R.string.notif_dev_title, label))
-            .setContentText(getString(R.string.notif_dev_text, actions))
-            .setStyle(NotificationCompat.BigTextStyle()
-                .bigText(getString(R.string.notif_dev_text, actions)))
-            .setContentIntent(open)
             .setOngoing(true)
             .setOnlyAlertOnce(true)
             .setSilent(true)
             .setPriority(NotificationCompat.PRIORITY_LOW)
-            .build()
-        nm.notify(NOTIF_DEV, notification)
+
+        if (profile == Profile.NONE) {
+            builder.setContentTitle(getString(R.string.notif_idle_title))
+                .setContentText("待机：${DevModeController.power(ctx).describe()}")
+                .setContentIntent(PendingIntent.getActivity(
+                    this, REQ_OPEN_APP, Intent(this, MainActivity::class.java),
+                    PendingIntent.FLAG_IMMUTABLE,
+                ))
+        } else {
+            val label = if (profile == Profile.WIRED) "有线" else "无线调试"
+            val actions = actionsText(if (profile == Profile.WIRED) Config.wired(ctx) else Config.wifi(ctx))
+            val text = getString(R.string.notif_dev_text, actions)
+            builder.setContentTitle(getString(R.string.notif_dev_title, label))
+                .setContentText(text)
+                .setStyle(NotificationCompat.BigTextStyle().bigText(text))
+                .setContentIntent(PendingIntent.getActivity(
+                    this, REQ_BLACK, Intent(this, BlackScreenActivity::class.java),
+                    PendingIntent.FLAG_IMMUTABLE,
+                ))
+        }
+        getSystemService(NotificationManager::class.java).notify(NOTIF_ID, builder.build())
     }
+
+    private fun initialNotification(): Notification =
+        NotificationCompat.Builder(this, CHANNEL)
+            .setSmallIcon(R.drawable.ic_stat_bolt)
+            .setContentTitle(getString(R.string.notif_idle_title))
+            .setContentText("正在监听 USB / 无线调试连接…")
+            .setOngoing(true)
+            .setSilent(true)
+            .setPriority(NotificationCompat.PRIORITY_LOW)
+            .build()
 
     private fun actionsText(cfg: ProfileConfig): String =
         cfg.actions().joinToString(" · ") { it.label }.ifEmpty { "未启用动作" }
-
-    private fun buildNotification(text: String): Notification {
-        val open = PendingIntent.getActivity(
-            this, 0, Intent(this, MainActivity::class.java), PendingIntent.FLAG_IMMUTABLE,
-        )
-        return NotificationCompat.Builder(this, CHANNEL)
-            .setSmallIcon(R.drawable.ic_stat_bolt)
-            .setContentTitle(getString(R.string.app_name))
-            .setContentText(text)
-            .setContentIntent(open)
-            .setOngoing(true)
-            .setOnlyAlertOnce(true)
-            .setSilent(true)
-            .setPriority(NotificationCompat.PRIORITY_LOW)
-            .build()
-    }
 
     private fun createChannel() {
         val channel = NotificationChannel(CHANNEL, "USB 监听服务", NotificationManager.IMPORTANCE_LOW).apply {
@@ -154,7 +140,8 @@ class MonitorService : Service() {
     companion object {
         private const val CHANNEL = "monitor"
         private const val NOTIF_ID = 1
-        private const val NOTIF_DEV = 2
+        private const val NOTIF_LEGACY_DEV = 2
+        private const val REQ_OPEN_APP = 0
         private const val REQ_BLACK = 1
         private const val ACTION_USB_STATE = "android.hardware.usb.action.USB_STATE"
 
