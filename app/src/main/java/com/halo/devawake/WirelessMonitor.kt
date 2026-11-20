@@ -41,6 +41,8 @@ object WirelessMonitor {
                             App.instance,
                             if (flipped) "无线调试已连接" else "无线调试已断开",
                         )
+                        // 无线触发的同步不经过服务里的接收器路径，手动刷新通知（含黑屏入口通知）
+                        MonitorService.refreshNotifications()
                     }
                 }.onFailure { Log.w(TAG, "wireless tick failed", it) }
                 Thread.sleep(INTERVAL_MS)

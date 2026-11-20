@@ -48,6 +48,7 @@ class MonitorService : Service() {
 
     override fun onCreate() {
         super.onCreate()
+        instance = this
         running = true
         createChannel()
         ServiceCompat.startForeground(
@@ -55,6 +56,8 @@ class MonitorService : Service() {
             ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE,
         )
         WirelessMonitor.start()
+        // Shizuku 就绪后修复历史遗留（黑屏期间进程被杀导致侧边栏原值未恢复）
+        Tasks.run { SidebarController.migrateLegacy(applicationContext) }
         val filter = IntentFilter().apply {
             addAction(Intent.ACTION_POWER_CONNECTED)
             addAction(Intent.ACTION_POWER_DISCONNECTED)
@@ -67,6 +70,7 @@ class MonitorService : Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int = START_STICKY
 
     override fun onDestroy() {
+        instance = null
         running = false
         handler.removeCallbacks(syncRunnable)
         runCatching { unregisterReceiver(receiver) }
@@ -109,6 +113,8 @@ class MonitorService : Service() {
             .setSmallIcon(R.drawable.ic_stat_bolt)
             .setContentTitle(getString(R.string.notif_dev_title, label))
             .setContentText(getString(R.string.notif_dev_text, actions))
+            .setStyle(NotificationCompat.BigTextStyle()
+                .bigText(getString(R.string.notif_dev_text, actions)))
             .setContentIntent(open)
             .setOngoing(true)
             .setOnlyAlertOnce(true)
@@ -153,11 +159,19 @@ class MonitorService : Service() {
         private const val ACTION_USB_STATE = "android.hardware.usb.action.USB_STATE"
 
         @Volatile
+        private var instance: MonitorService? = null
+
+        @Volatile
         var running = false
             private set
 
         fun start(ctx: Context) {
             ContextCompat.startForegroundService(ctx, Intent(ctx, MonitorService::class.java))
+        }
+
+        /** 场景状态可能由无线检测线程或清单接收器直接同步，通知需要随之刷新 */
+        fun refreshNotifications() {
+            instance?.let { svc -> svc.handler.post { svc.updateNotification() } }
         }
     }
 }

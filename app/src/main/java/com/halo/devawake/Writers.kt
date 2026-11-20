@@ -19,6 +19,9 @@ interface SettingsWriter {
     fun putGlobal(key: String, value: Int): Boolean
     fun getSystem(key: String, def: Int): Int
     fun putSystem(key: String, value: Int): Boolean
+
+    /** 删除 system 表的键（恢复「未设置」状态）；不支持时返回 false */
+    fun deleteSystem(key: String): Boolean
 }
 
 object Writers {
@@ -54,6 +57,7 @@ private class CompositeWriter(
     override fun putGlobal(key: String, value: Int) = global.putGlobal(key, value)
     override fun getSystem(key: String, def: Int) = system.getSystem(key, def)
     override fun putSystem(key: String, value: Int) = system.putSystem(key, value)
+    override fun deleteSystem(key: String) = system.deleteSystem(key)
 }
 
 /** 持有 WRITE_SECURE_SETTINGS + 「修改系统设置」时的直写通道，无需任何外部进程 */
@@ -88,6 +92,10 @@ object DirectWriter : SettingsWriter {
 
     override fun putSystem(key: String, value: Int) =
         runCatching { Settings.System.putInt(resolver, key, value) }.getOrDefault(false)
+
+    /** 传 null 值即删除该行（SettingsProvider 的语义），等效 `settings delete` */
+    override fun deleteSystem(key: String) =
+        runCatching { Settings.System.putString(resolver, key, null); true }.getOrDefault(false)
 }
 
 /** Shizuku 兜底通道：以 shell 身份执行 `settings put/get`，适合没有做 adb 授权的场景 */
@@ -165,4 +173,9 @@ object ShizukuWriter : SettingsWriter {
     override fun putGlobal(key: String, value: Int) = put("global", key, value)
     override fun getSystem(key: String, def: Int) = get("system", key, def)
     override fun putSystem(key: String, value: Int) = put("system", key, value)
+
+    override fun deleteSystem(key: String): Boolean {
+        val out = exec("settings delete system $key") ?: return false
+        return !out.contains("Exception", true) && !out.contains("Error", true)
+    }
 }

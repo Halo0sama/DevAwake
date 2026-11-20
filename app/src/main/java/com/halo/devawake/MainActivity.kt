@@ -61,10 +61,12 @@ class MainActivity : AppCompatActivity() {
         bindSwitch(R.id.swWiredKeepAwake, wired = true, field = Field.KEEP_AWAKE)
         bindSwitch(R.id.swWiredAutoBright, wired = true, field = Field.AUTO_BRIGHTNESS)
         bindSwitch(R.id.swWiredMinBright, wired = true, field = Field.MIN_BRIGHTNESS)
+        bindSwitch(R.id.swWiredNeverSleep, wired = true, field = Field.NEVER_SLEEP)
         bindSwitch(R.id.swWifiEnabled, wired = false, field = Field.ENABLED)
         bindSwitch(R.id.swWifiKeepAwake, wired = false, field = Field.KEEP_AWAKE)
         bindSwitch(R.id.swWifiAutoBright, wired = false, field = Field.AUTO_BRIGHTNESS)
         bindSwitch(R.id.swWifiMinBright, wired = false, field = Field.MIN_BRIGHTNESS)
+        bindSwitch(R.id.swWifiNeverSleep, wired = false, field = Field.NEVER_SLEEP)
         findViewById<MaterialSwitch>(R.id.swWifiFallback).setOnCheckedChangeListener { _, checked ->
             if (suppressSwitch) return@setOnCheckedChangeListener
             Tasks.run {
@@ -142,6 +144,7 @@ class MainActivity : AppCompatActivity() {
             val stay = Settings.Global.getInt(contentResolver, Settings.Global.STAY_ON_WHILE_PLUGGED_IN, -1)
             val mode = Settings.System.getInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS_MODE, -1)
             val bright = Settings.System.getInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS, -1)
+            val timeout = Settings.System.getInt(contentResolver, Settings.System.SCREEN_OFF_TIMEOUT, -1)
             val missing = DirectWriter.missing(ctx)
             val shizukuRunning = ShizukuWriter.running()
             val shizukuOk = ShizukuWriter.available()
@@ -162,22 +165,26 @@ class MainActivity : AppCompatActivity() {
                         "电池上报：${DevModeController.pluggedText(power.plugged)}；USB 数据连接：${if (power.usbData) "是" else "否"}"
                 tvSettings.text = "stay_on_while_plugged_in = $stay\n" +
                         "screen_brightness_mode   = ${when (mode) { 1 -> "1（自动）"; 0 -> "0（手动）"; else -> "$mode" }}\n" +
-                        "screen_brightness        = $bright"
+                        "screen_brightness        = $bright\n" +
+                        "screen_off_timeout(ms)   = $timeout"
                 tvWriter.text = "监听服务：${if (MonitorService.running) "运行中（前台服务）" else "未运行"}\n" +
                         "写入通道：${writer?.label ?: "无（缺少授权）"}\n" +
                         "· 系统权限：${if (missing == null) "已具备" else "缺少 $missing"}\n" +
                         "· Shizuku：${when { shizukuOk -> "已授权"; shizukuRunning -> "运行中，未授权"; else -> "未运行" }}\n" +
-                        WirelessMonitor.statusText(ctx)
+                        WirelessMonitor.statusText(ctx) +
+                        "\n侧边栏实时：${SidebarController.liveStatus(ctx)}"
                 tvLast.text = "上次动作：$last"
 
                 findViewById<MaterialSwitch>(R.id.swWiredEnabled).isChecked = wiredCfg.enabled
                 findViewById<MaterialSwitch>(R.id.swWiredKeepAwake).isChecked = wiredCfg.keepAwake
                 findViewById<MaterialSwitch>(R.id.swWiredAutoBright).isChecked = wiredCfg.autoBrightness
                 findViewById<MaterialSwitch>(R.id.swWiredMinBright).isChecked = wiredCfg.minBrightness
+                findViewById<MaterialSwitch>(R.id.swWiredNeverSleep).isChecked = wiredCfg.neverSleep
                 findViewById<MaterialSwitch>(R.id.swWifiEnabled).isChecked = wifiCfg.enabled
                 findViewById<MaterialSwitch>(R.id.swWifiKeepAwake).isChecked = wifiCfg.keepAwake
                 findViewById<MaterialSwitch>(R.id.swWifiAutoBright).isChecked = wifiCfg.autoBrightness
                 findViewById<MaterialSwitch>(R.id.swWifiMinBright).isChecked = wifiCfg.minBrightness
+                findViewById<MaterialSwitch>(R.id.swWifiNeverSleep).isChecked = wifiCfg.neverSleep
                 findViewById<MaterialSwitch>(R.id.swWifiFallback).isChecked = fallback
                 suppressSwitch = false
 

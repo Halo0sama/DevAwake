@@ -14,6 +14,7 @@ enum class DevAction(val label: String) {
     KEEP_AWAKE("保持亮屏"),
     AUTO_BRIGHTNESS("关闭自动亮度"),
     MIN_BRIGHTNESS("亮度调至最低"),
+    NEVER_SLEEP("永不熄屏"),
 }
 
 /** 一个场景的开关组合 */
@@ -22,16 +23,18 @@ data class ProfileConfig(
     val keepAwake: Boolean = true,
     val autoBrightness: Boolean = true,
     val minBrightness: Boolean = true,
+    val neverSleep: Boolean = true,
 ) {
     fun actions(): List<DevAction> = buildList {
         if (keepAwake) add(DevAction.KEEP_AWAKE)
         if (autoBrightness) add(DevAction.AUTO_BRIGHTNESS)
         if (minBrightness) add(DevAction.MIN_BRIGHTNESS)
+        if (neverSleep) add(DevAction.NEVER_SLEEP)
     }
 }
 
 /** 界面开关对应的配置项 */
-enum class Field { ENABLED, KEEP_AWAKE, AUTO_BRIGHTNESS, MIN_BRIGHTNESS }
+enum class Field { ENABLED, KEEP_AWAKE, AUTO_BRIGHTNESS, MIN_BRIGHTNESS, NEVER_SLEEP }
 
 /** 开关配置的存取（默认全部开启） */
 object Config {
@@ -62,6 +65,7 @@ object Config {
             Field.KEEP_AWAKE -> "keep_awake"
             Field.AUTO_BRIGHTNESS -> "auto_bright"
             Field.MIN_BRIGHTNESS -> "min_bright"
+            Field.NEVER_SLEEP -> "never_sleep"
         }
         val changed = sp.getBoolean(prefix + key, true) != value
         if (changed) sp.edit().putBoolean(prefix + key, value).apply()
@@ -75,6 +79,7 @@ object Config {
             keepAwake = sp.getBoolean(prefix + "keep_awake", true),
             autoBrightness = sp.getBoolean(prefix + "auto_bright", true),
             minBrightness = sp.getBoolean(prefix + "min_bright", true),
+            neverSleep = sp.getBoolean(prefix + "never_sleep", true),
         )
     }
 }

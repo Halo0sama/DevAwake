@@ -106,6 +106,15 @@
                         android:id="@+id/swWiredMinBright"
                         style="@style/SwitchWidget" />
                 </LinearLayout>
+
+                <LinearLayout style="@style/SwitchRow">
+                    <TextView
+                        style="@style/SwitchLabel"
+                        android:text="@string/sw_never_sleep" />
+                    <com.google.android.material.materialswitch.MaterialSwitch
+                        android:id="@+id/swWiredNeverSleep"
+                        style="@style/SwitchWidget" />
+                </LinearLayout>
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
@@ -159,6 +168,15 @@
                         android:text="@string/sw_min_bright" />
                     <com.google.android.material.materialswitch.MaterialSwitch
                         android:id="@+id/swWifiMinBright"
+                        style="@style/SwitchWidget" />
+                </LinearLayout>
+
+                <LinearLayout style="@style/SwitchRow">
+                    <TextView
+                        style="@style/SwitchLabel"
+                        android:text="@string/sw_never_sleep" />
+                    <com.google.android.material.materialswitch.MaterialSwitch
+                        android:id="@+id/swWifiNeverSleep"
                         style="@style/SwitchWidget" />
                 </LinearLayout>
 

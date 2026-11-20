@@ -7,10 +7,11 @@
     <string name="sw_keep_awake">充电时保持亮屏</string>
     <string name="sw_auto_bright">关闭自动亮度</string>
     <string name="sw_min_bright">亮度调至最低</string>
+    <string name="sw_never_sleep">永不熄屏（临时延长熄屏超时）</string>
     <string name="sw_fallback">Shizuku 未运行时按无线调试开关判定（不精确）</string>
     <string name="btn_apply">立即应用（按 USB 接入处理）</string>
     <string name="btn_restore">立即恢复原设置</string>
-    <string name="btn_black_screen">进入黑屏模式（触摸屏幕或返回键退出）</string>
+    <string name="btn_black_screen">进入黑屏模式（返回键 / 侧滑手势退出）</string>
     <string name="notif_dev_title">调试模式生效中（%1$s）</string>
     <string name="notif_dev_text">%1$s · 点击进入黑屏模式</string>
     <string name="btn_app_info">打开应用设置（自启动 / 省电策略）</string>

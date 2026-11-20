@@ -40,12 +40,20 @@ object DevModeController {
     private const val KEY_SAVED_STAY = "saved_stay"
     private const val KEY_SAVED_MODE = "saved_mode"
     private const val KEY_SAVED_BRIGHT = "saved_bright"
+    private const val KEY_SAVED_TIMEOUT = "saved_timeout"
     private const val KEY_LAST_MSG = "last_message"
 
     private const val ACTION_USB_STATE = "android.hardware.usb.action.USB_STATE"
 
     /** 亮度 0 在部分机型等于熄屏，1 是安全的最低可见亮度 */
     private const val MIN_BRIGHTNESS = 1
+
+    /**
+     * 「永不熄屏」用的熄屏超时（毫秒，约 24.9 天）。
+     * stay_on_while_plugged_in 只在插电时生效；无线调试时手机不充电，
+     * 必须临时把 system 表的 screen_off_timeout 改成超大值，退出时恢复原值。
+     */
+    private const val NEVER_SLEEP_TIMEOUT = Int.MAX_VALUE
 
     /** 与开发者选项「充电时保持亮屏」一致：覆盖全部供电类型 */
     private const val STAY_ON_ANY = BatteryManager.BATTERY_PLUGGED_AC or
@@ -192,6 +200,7 @@ object DevModeController {
             DevAction.KEEP_AWAKE -> edit.putInt(KEY_SAVED_STAY, writer.getGlobal(Settings.Global.STAY_ON_WHILE_PLUGGED_IN, 0))
             DevAction.AUTO_BRIGHTNESS -> edit.putInt(KEY_SAVED_MODE, writer.getSystem(Settings.System.SCREEN_BRIGHTNESS_MODE, Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC))
             DevAction.MIN_BRIGHTNESS -> edit.putInt(KEY_SAVED_BRIGHT, writer.getSystem(Settings.System.SCREEN_BRIGHTNESS, 128))
+            DevAction.NEVER_SLEEP -> edit.putInt(KEY_SAVED_TIMEOUT, writer.getSystem(Settings.System.SCREEN_OFF_TIMEOUT, -1))
         }
         edit.putStringSet(KEY_SAVED_SET, actions.map { it.name }.toSet())
             .putString(KEY_ACTIVE, profile.name)
@@ -206,11 +215,18 @@ object DevModeController {
         DevAction.KEEP_AWAKE -> writer.putGlobal(Settings.Global.STAY_ON_WHILE_PLUGGED_IN, STAY_ON_ANY)
         DevAction.AUTO_BRIGHTNESS -> writer.putSystem(Settings.System.SCREEN_BRIGHTNESS_MODE, Settings.System.SCREEN_BRIGHTNESS_MODE_MANUAL)
         DevAction.MIN_BRIGHTNESS -> writer.putSystem(Settings.System.SCREEN_BRIGHTNESS, MIN_BRIGHTNESS)
+        DevAction.NEVER_SLEEP -> writer.putSystem(Settings.System.SCREEN_OFF_TIMEOUT, NEVER_SLEEP_TIMEOUT)
     }
 
     private fun writeSaved(a: DevAction, writer: SettingsWriter, p: SharedPreferences): Boolean = when (a) {
         DevAction.KEEP_AWAKE -> writer.putGlobal(Settings.Global.STAY_ON_WHILE_PLUGGED_IN, p.getInt(KEY_SAVED_STAY, 0))
         DevAction.AUTO_BRIGHTNESS -> writer.putSystem(Settings.System.SCREEN_BRIGHTNESS_MODE, p.getInt(KEY_SAVED_MODE, Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC))
         DevAction.MIN_BRIGHTNESS -> writer.putSystem(Settings.System.SCREEN_BRIGHTNESS, p.getInt(KEY_SAVED_BRIGHT, 128))
+        // 原值 -1 表示原本没有显式设置，恢复「未设置」状态（等效 settings delete）
+        DevAction.NEVER_SLEEP -> {
+            val saved = p.getInt(KEY_SAVED_TIMEOUT, -1)
+            if (saved < 0) writer.deleteSystem(Settings.System.SCREEN_OFF_TIMEOUT)
+            else writer.putSystem(Settings.System.SCREEN_OFF_TIMEOUT, saved)
+        }
     }
 }
